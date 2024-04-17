@@ -1,0 +1,85 @@
+body {
+    background-color: #f4f4f4;
+}
+
+.postForm {
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 430px;
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.postForm .form-group {
+    /*display: grid;*/
+    grid-template-columns: 100px 1fr;
+    grid-gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+    margin-left: 10px;
+}
+
+.postForm label {
+    font-weight: bold;
+    padding: 0;
+}
+
+.postForm,
+input[type="text"],
+textarea,
+input[type="file"] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+}
+
+.postForm input[type="file"] {
+    border: none;
+}
+
+.postFormButton {
+    display: block;
+    margin: 5px auto 0;
+    padding: 10px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#toggleFormButton {
+    margin: 10px auto;
+}
+
+.postFormButton:hover {
+    background-color: #0056b3;
+}
+
+.postFormButton:active {
+    background-color: #004280;
+}
+
+td:first-child {
+    border: 1px solid black;
+    /*background-color: #ea8;*/
+    background-color: #9dd7ff;
+    font-weight: bold;
+    color: #333333;
+    padding: 0 5px;
+    border-radius: 0;
+}
+
+#postFormNotification {
+    margin: 10px auto auto;
+    text-align: center;
+    /*z-index: 1000;*/
+    display: none;
+}
+
+
+

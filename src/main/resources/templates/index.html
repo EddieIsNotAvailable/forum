@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forum</title>
+
+    <link rel="stylesheet" type="text/css" href="/css/postForm.css">
+    <link rel="stylesheet" type="text/css" href="/css/threads.css">
+</head>
+<body>
+<button id="toggleFormButton" class="postFormButton">Close Form</button>
+<div class="postForm">
+    <form id="threadForm" enctype="multipart/form-data">
+        <table>
+            <tr class="form-group">
+                <td><label for="pfSubject">Subject:</label></td>
+                <td><input type="text" id="pfSubject" name="subject" required></td>
+            </tr>
+            <tr class="form-group">
+                <td><label for="pfContent">Content:</label></td>
+                <td><textarea id="pfContent" name="content" rows="6" maxlength="10000" required></textarea></td>
+            </tr>
+            <tr class="form-group">
+                <td><label for="pfImage">Upload File:</label></td>
+                <td><input type="file" id="pfImage" name="fileData" required></td>
+            </tr>
+            <tr class="form-group">
+                <td><label for="pfPassword">Thread Password</label></td>
+                <td><input type="text" id="pfPassword" name="password" required></td>
+            </tr>
+        </table>
+        <button type="submit" class="postFormButton">Create Thread</button>
+        <div id="postFormNotification" class="notification"></div>
+    </form>
+</div>
+<div id="threadsContainer"></div>
+<div id="paginationContainer"></div>
+<script type="module" src="/js/postForm.js"></script>
+<script type="module" src="/js/loadThreads.js"></script>
+<script type="module" src="/js/pagination.js"></script>
+</body>
+</html>
