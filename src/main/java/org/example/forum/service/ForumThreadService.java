@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.Base64;
+import java.util.BitSet;
 import java.util.Optional;
 
 import static org.example.forum.utility.TranscodeMessage.getOffsetBitSize;
@@ -36,8 +36,6 @@ public class ForumThreadService {
             thread.getSubject(),
             thread.getContent(),
             thread.getFileContentType(),
-//            Base64.getEncoder().encodeToString(thread.getFileData()),
-            thread.getFileData(),
             thread.getDateTime()
         );
     }
@@ -49,38 +47,22 @@ public class ForumThreadService {
 
     public void createThread(ForumThread thread) {
         LocalDateTime now = LocalDateTime.now();
-
         String dateTime = now.format(DATE_TIME_FORMATTER);
         thread.setDateTime(dateTime);
 
-//        LocalDateTime d = LocalDateTime.parse(dateTime, DATE_TIME_FORMATTER);
-//        int sec = d.getSecond();
-//        int offset = getOffsetBitSize(thread.getSubject(),0);
-//        int period = getPeriodBitSize(thread.getSubject(), sec);
-
-        //Split subject into words, remove empty strings
-        System.out.println("Thread content: " + thread.getContent());
-        System.out.println("Thread subject: " + thread.getSubject());
-        System.out.println("file size (bytes): " + thread.getFileData().length);
         int offset = getOffsetBitSize(thread.getContent());
         int[] periods = getPeriods(thread.getSubject());
-        System.out.println("In creating thread, offset: " + offset + " periods: " + Arrays.toString(periods));
+//        System.out.println("In creating thread, offset: " + offset + " periods: " + Arrays.toString(periods)); //RM
         byte[] encodedFileData = TranscodeMessage.encodeMessage(thread.getFileData(), thread.getPassword(), offset, periods);
-
         thread.setFileData(encodedFileData);
 
-        System.out.println("Saved thread (id: " + thread.getId() + " offset: " + offset + " periods: " + Arrays.toString(periods) + ")");
         forumThreadRepository.save(thread);
     }
 
     public boolean validatePassword(Long threadId, String password) {
         Optional<ForumThread> t = forumThreadRepository.findById(threadId);
         if(t.isEmpty()) return false;
-
         ForumThread thread = t.get();
-//        int offset = getOffsetBitSize(thread.getContent());
-//        int[] periods = getPeriods(thread.getSubject());
-//        return TranscodeMessage.decodeMessage(thread.getFileData(), thread.getPassword(), offset, periods);
         return thread.getPassword().equals(password);
     }
 
@@ -92,5 +74,27 @@ public class ForumThreadService {
         ForumThread thread = forumThreadRepository.findById(threadId).orElse(null);
         if(thread == null) throw new IllegalArgumentException("Thread not found");
         return ThreadToDTO(thread);
+    }
+
+    public byte[] getThreadFileById(Long threadId) {
+        ForumThread thread = forumThreadRepository.findById(threadId).orElse(null);
+        if(thread == null) throw new IllegalArgumentException("Thread not found");
+
+        BitSet carrierBits = BitSet.valueOf(thread.getFileData());
+        int offset = getOffsetBitSize(thread.getContent());
+        int[] periods = getPeriods(thread.getSubject());
+//        System.out.println("In getting thread file, offset: " + offset + " periods: " + Arrays.toString(periods)); //RM
+
+//        int idx = offset; boolean bit;
+//        String pass = thread.getPassword();
+//        String p = new String(pass.getBytes(), java.nio.charset.StandardCharsets.UTF_8);
+//        for(int i=0; i<p.getBytes().length * 8; i++) {
+//            bit = carrierBits.get(idx);
+//            System.out.println("Bit " + i + " at idx [" + idx + "] = " + bit);
+//            idx += periods[i % periods.length];
+//        }
+
+
+        return thread.getFileData();
     }
 }

@@ -14,6 +14,6 @@ public class ForumThreadDTO {
     private String subject;
     private String content;
     private String fileContentType;
-    private byte[] fileData;
+//    private byte[] fileData;
     private String dateTime;
 }

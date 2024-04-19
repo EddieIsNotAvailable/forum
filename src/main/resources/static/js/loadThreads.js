@@ -2,24 +2,48 @@ import {updatePagination} from "./pagination.js";
 
 let currentPageNumber = localStorage.getItem("currentPageNumber") !== null ? parseInt(localStorage.getItem("currentPageNumber")) : 0;
 
+async function fetchThreadFile(threadId) {
+    const response = await fetch(`/api/threads/${threadId}/file`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/octet-stream'
+        }
+    });
+    if (!response.ok) {
+        throw new Error('Failed to retrieve file');
+    }
+    // return response.blob();
+    const blob = await response.blob();
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+    });
+}
+
 async function fetchThreads(pageNumber) {
-    console.log(`fetching threads at page: ${pageNumber}`);
     const response = await fetch(`/api/threads/all?page=${pageNumber}`);
-    return await response.json();
+    if (!response.ok) {
+        throw new Error(`Failed to fetch threads: ${response.status}`);
+    }
+    return response.json();
 }
 
 export async function loadThreads(pageNumber) {
     const threads = await fetchThreads(pageNumber);
     const threadsContainer = document.getElementById("threadsContainer");
     threadsContainer.innerHTML = "";
-    threads.content.forEach((thread) => {
+    for(const thread of threads.content) {
+        const renderedFile = await renderFile(thread);
         const threadElement = document.createElement("div");
         threadElement.innerHTML = `
         <hr>
         <div id="${thread.id}" class="thread threadContainer">
             <div class="threadContent">
                 <div class="fileContainer">
-                    ${renderFile(thread)}
+                    ${renderedFile}
                 </div>
                 <div class="threadInfo">
                     <span class="subject">${thread.subject}</span>
@@ -32,45 +56,44 @@ export async function loadThreads(pageNumber) {
         </div>
         `;
         threadsContainer.appendChild(threadElement);
+    }
+    threads.content.forEach((thread) => {
         document.getElementById(`password_${thread.id}`).addEventListener("keypress", (e) => {
             if(e.key === "Enter" && e.target.value !== "") {
                 submitThreadPassword(thread.id);
             }
         });
     });
+
     let threadsLoaded = threads.content.length;
     updatePagination(currentPageNumber, threadsLoaded);
 }
-
-// function toggleFilePreview(imgId) {
-//     const img = document.getElementById(`file_${imgId}`);
-//     img.classList.toggle("fileThumb");
-// }
 
 window.toggleFilePreview = function(imgId) {
     const img = document.getElementById(`file_${imgId}`);
     img.classList.toggle("fileThumb");
 }
-function renderFile(thread) {
+
+async function renderFile(thread) {
     const contentType = thread.fileContentType;
     const fileType = contentType.split("/")[1];
-    // const fileLink = `<a href="data:${contentType};base64,${thread.fileData}" download="file_${thread.id}.${fileType}" class="fileLink">Download File</a>`;
-    const fileLink = `<a href="data:${contentType};${thread.fileData}" download="file_${thread.id}.${fileType}" class="fileLink">Download File</a>`;
+    const fileData = await fetchThreadFile(thread.id);
+    const fileLink = `<a href="data:${contentType};${fileData}" download="file_${thread.id}.${fileType}" class="fileLink">Download File</a>`;
 
     const threadPasswordInput = `<input type="text" id="password_${thread.id}" class="threadPassword" placeholder="Thread Password">`;
     if (contentType.startsWith('image')) {
         return `${fileLink}
-                <img src="data:${contentType};base64,${thread.fileData}" alt="file" id="file_${thread.id}" onclick="toggleFilePreview(${thread.id})" class="fileThumb">
+                <img src="data:${contentType};${fileData}" alt="file" id="file_${thread.id}" onclick="toggleFilePreview(${thread.id})" class="fileThumb">
                 ${threadPasswordInput}`;
     } else if (contentType.startsWith('video')) {
         return `${fileLink}
-                <video controls src="data:${contentType};base64,${thread.fileData}" id="file_${thread.id}" class="fileThumb">
+                <video controls src="data:${contentType};${fileData}" id="file_${thread.id}" class="fileThumb">
                     Your browser does not support the video tag.
                 </video>
                ${threadPasswordInput}`;
     } else if(contentType.startsWith('audio')) {
         return `${fileLink}
-                <audio controls src="data:${contentType};base64,${thread.fileData}" id="file_${thread.id}" class="fileThumb">
+                <audio controls src="data:${contentType};${fileData}" id="file_${thread.id}" class="fileThumb">
                     Your browser does not support the audio tag.
                 </audio>
                 ${threadPasswordInput}`;
@@ -107,26 +130,6 @@ window.submitThreadPassword = async function (threadId) {
         alert(`Invalid password for thread ${threadId}`);
     }
 }
-
-// function downloadFile(threadId, fileData) {
-//     const blob = base64ToBlob(fileData);
-//     const url = URL.createObjectURL(blob);
-//     const a = document.createElement('a');
-//     a.href = url;
-//     a.download = `file_${threadId}`;
-//     document.body.appendChild(a);
-//     a.click();
-//     document.body.removeChild(a);
-//     URL.revokeObjectURL(url);
-// }
-//
-// function base64ToBlob(base64string) {
-//     var binary_string = window.atob(base64string);
-//     var len = binary_string.length;
-//     var bytes = new Uint8Array( len );
-//     for (var i = 0; i < len; i++) { bytes[i] = binary_string.charCodeAt(i); }
-//     return new Blob([bytes.buffer], {type: "octet/stream"});
-// }
 
 window.onload = () => {
     (async () => {

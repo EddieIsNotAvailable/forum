@@ -9,15 +9,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Base64;
 import java.util.BitSet;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/threads")
@@ -40,11 +41,7 @@ public class ThreadController {
 
     @PostMapping("/create")
     public ResponseEntity<?> createThread(@Valid @ModelAttribute ForumThreadCreationRequest thread, BindingResult result) {
-
-        if(result.hasErrors()) {
-            return ResponseEntity.badRequest().body("Invalid request");
-        }
-
+        if(result.hasErrors()) return ResponseEntity.badRequest().body("Invalid request");
         MultipartFile file = thread.getFileData();
 
         byte[] fileData = null;
@@ -73,7 +70,7 @@ public class ThreadController {
     }
 
     @PostMapping(path="{threadId}/{password}")
-    public ResponseEntity<String> getThread(@PathVariable Long threadId, @PathVariable String password) {
+    public ResponseEntity<String> validateThreadPassword(@PathVariable Long threadId, @PathVariable String password) {
         boolean validPassword = forumThreadService.validatePassword(threadId, password);
         if(!validPassword) {
             return ResponseEntity.badRequest().body("Invalid password");
@@ -94,29 +91,24 @@ public class ThreadController {
     //Use to get single thread by id, requested externally
     @GetMapping(path="/{threadId}")
     public ResponseEntity<?> getThread(@PathVariable Long threadId) {
-//        System.out.println("Getting thread by id: " + threadId);
         try {
             ForumThreadDTO thread = forumThreadService.getThreadById(threadId);
-            String fdata = thread.getFileData();
-            byte[] fbytes = Base64.getDecoder().decode(fdata);
-            BitSet bits = BitSet.valueOf(fbytes);
-            System.out.println("In Controller");
-            for(int i=0; i<bits.size(); i++) {
-                if(bits.get(i)) System.out.println("File [" + i + "] = 1");
-
-            }
-
-            //Print fbytes in hex
-            for(int i=0; i< 50; i++) {
-                System.out.printf("%d: %02X\t", i, fbytes[i]);
-
-            }
-
-
             return ResponseEntity.ok(thread);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+
+    @GetMapping(path="/{threadId}/file")
+    public ResponseEntity<byte[]> getThreadFile(@PathVariable Long threadId) {
+        byte[] fileData = forumThreadService.getThreadFileById(threadId);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDispositionFormData("attachment", "file");
+        headers.setContentLength(fileData.length);
+
+
+        return new ResponseEntity<>(fileData, headers, HttpStatus.OK);
     }
 
 }
