@@ -11,8 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.BitSet;
 import java.util.Optional;
 
 import static org.example.forum.utility.TranscodeMessage.getOffsetBitSize;
@@ -52,7 +50,6 @@ public class ForumThreadService {
 
         int offset = getOffsetBitSize(thread.getContent());
         int[] periods = getPeriods(thread.getSubject());
-//        System.out.println("In creating thread, offset: " + offset + " periods: " + Arrays.toString(periods)); //RM
         byte[] encodedFileData = TranscodeMessage.encodeMessage(thread.getFileData(), thread.getPassword(), offset, periods);
         thread.setFileData(encodedFileData);
 
@@ -79,22 +76,6 @@ public class ForumThreadService {
     public byte[] getThreadFileById(Long threadId) {
         ForumThread thread = forumThreadRepository.findById(threadId).orElse(null);
         if(thread == null) throw new IllegalArgumentException("Thread not found");
-
-        BitSet carrierBits = BitSet.valueOf(thread.getFileData());
-        int offset = getOffsetBitSize(thread.getContent());
-        int[] periods = getPeriods(thread.getSubject());
-//        System.out.println("In getting thread file, offset: " + offset + " periods: " + Arrays.toString(periods)); //RM
-
-//        int idx = offset; boolean bit;
-//        String pass = thread.getPassword();
-//        String p = new String(pass.getBytes(), java.nio.charset.StandardCharsets.UTF_8);
-//        for(int i=0; i<p.getBytes().length * 8; i++) {
-//            bit = carrierBits.get(idx);
-//            System.out.println("Bit " + i + " at idx [" + idx + "] = " + bit);
-//            idx += periods[i % periods.length];
-//        }
-
-
         return thread.getFileData();
     }
 }

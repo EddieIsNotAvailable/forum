@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.BitSet;
 
 @RestController
 @RequestMapping("/api/threads")
@@ -61,8 +60,6 @@ public class ThreadController {
             forumThreadService.createThread(newThread);
         } catch (Exception e) {
             System.out.println("Error creating thread: " + e);
-            System.out.println(e.getCause());
-            System.out.println(e.getMessage());
             return ResponseEntity.badRequest().body("Failed to save thread");
         }
 

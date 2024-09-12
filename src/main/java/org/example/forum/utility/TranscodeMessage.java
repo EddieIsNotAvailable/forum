@@ -1,7 +1,5 @@
 package org.example.forum.utility;
 
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -43,7 +41,6 @@ public class TranscodeMessage {
             for (i = 0; i < messageBits.size(); i++) {
                 bit = messageBits.get(i);
                 carrierBits.set(index, bit);
-//                System.out.println("Setting bit at index " + index + " to " + bit);
                 index += period;
             }
         } else {
@@ -73,16 +70,6 @@ public class TranscodeMessage {
         for (i=0; i < nbytes.length; i++) {
             carrier[i] = nbytes[i];
         }
-
-//        BitSet somebits = BitSet.valueOf(carrier); //RM
-//        for(i=0; i<somebits.size(); i++) {
-//            if(somebits.get(i)) System.out.println("File [" + i + "] = 1");
-//        }
-//        int idx=offset; //RM
-//        for(i=0; i< messageBits.size(); i++) {
-//            System.out.println("File idx [" + idx + "] = " + (somebits.get(idx) ? 1 : 0));
-//            idx += periods[i % periods.length];
-//        }
 
         return carrier;
     }
