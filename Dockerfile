@@ -1,6 +1,6 @@
 FROM openjdk:21-jdk-slim
 
-WORKDIR /crypto_app
+WORKDIR /forum
 
 COPY pom.xml .
 
@@ -12,4 +12,4 @@ RUN mvn clean package -DskipTests
 
 EXPOSE 8080
 
-CMD ["java", "-jar", "target/crypto_app-0.0.1-SNAPSHOT.jar"]
+CMD ["java", "-jar", "target/forum-0.0.1-SNAPSHOT.jar"]
