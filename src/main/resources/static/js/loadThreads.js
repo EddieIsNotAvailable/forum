@@ -111,9 +111,9 @@ window.deleteThread = async function (threadId) {
     });
     if (response.ok) {
         loadThreads(currentPageNumber);
-        alert(`Thread ${threadId} deleted`);
+        alert(`#${threadId} deleted`);
     } else {
-        alert(`Thread ${threadId} could not be deleted`);
+        alert(`#${threadId} could not be deleted`);
     }
 
 }
@@ -125,9 +125,9 @@ window.submitThreadPassword = async function (threadId) {
         method: "POST"
     });
     if (response.ok) {
-        alert(`Correct password for #${threadId}`);
+        alert(`Correct password`);
     } else {
-        alert(`Invalid password for #${threadId}`);
+        alert(`Invalid password`);
     }
 }
 
