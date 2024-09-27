@@ -14,7 +14,6 @@ body {
 }
 
 .postForm .form-group {
-    /*display: grid;*/
     grid-template-columns: 100px 1fr;
     grid-gap: 10px;
     align-items: center;
@@ -45,7 +44,8 @@ input[type="file"] {
     display: block;
     margin: 5px auto 0;
     padding: 10px;
-    background-color: #007bff;
+    background-color: #313842;
+
     color: #fff;
     border: none;
     border-radius: 4px;
@@ -57,16 +57,12 @@ input[type="file"] {
 }
 
 .postFormButton:hover {
-    background-color: #0056b3;
-}
-
-.postFormButton:active {
-    background-color: #004280;
+    background-color: #44546c;
 }
 
 td:first-child {
     border: 1px solid black;
-    background-color: #9dd7ff;
+    background-color: #c4c4cd;
     font-weight: bold;
     color: #333333;
     padding: 0 5px;

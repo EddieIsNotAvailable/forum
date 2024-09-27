@@ -26,7 +26,7 @@ async function fetchThreadFile(threadId) {
 async function fetchThreads(pageNumber) {
     const response = await fetch(`/api/threads/all?page=${pageNumber}`);
     if (!response.ok) {
-        throw new Error(`Failed to fetch threads: ${response.status}`);
+        throw new Error(`Failed to fetch posts: ${response.status}`);
     }
     return response.json();
 }
@@ -80,7 +80,7 @@ async function renderFile(thread) {
     const fileData = await fetchThreadFile(thread.id);
     const fileLink = `<a href="data:${contentType};${fileData}" download="file_${thread.id}.${fileType}" class="fileLink">Download File</a>`;
 
-    const threadPasswordInput = `<input type="text" id="password_${thread.id}" class="threadPassword" placeholder="Thread Password">`;
+    const threadPasswordInput = `<input type="text" id="password_${thread.id}" class="threadPassword" placeholder="Password">`;
     if (contentType.startsWith('image')) {
         return `${fileLink}
                 <img src="data:${contentType};${fileData}" alt="file" id="file_${thread.id}" onclick="toggleFilePreview(${thread.id})" class="fileThumb">
@@ -125,9 +125,9 @@ window.submitThreadPassword = async function (threadId) {
         method: "POST"
     });
     if (response.ok) {
-        alert(`Correct password for thread ${threadId}`);
+        alert(`Correct password for #${threadId}`);
     } else {
-        alert(`Invalid password for thread ${threadId}`);
+        alert(`Invalid password for #${threadId}`);
     }
 }
 
